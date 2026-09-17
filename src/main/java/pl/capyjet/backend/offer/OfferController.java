@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.capyjet.backend.offer.dto.AcceptedOfferResponse;
 import pl.capyjet.backend.offer.dto.OfferRequest;
 import pl.capyjet.backend.offer.dto.OfferResponse;
 
@@ -42,5 +43,10 @@ public class OfferController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         offerService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/accept")
+    public AcceptedOfferResponse accept(@PathVariable Long id) {
+        return offerService.accept(id);
     }
 }

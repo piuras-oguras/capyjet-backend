@@ -3,6 +3,8 @@ package pl.capyjet.backend.offer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.capyjet.backend.common.exception.NotFoundException;
+import pl.capyjet.backend.common.exception.OfferNotAvailableException;
+import pl.capyjet.backend.offer.dto.AcceptedOfferResponse;
 import pl.capyjet.backend.offer.dto.OfferRequest;
 import pl.capyjet.backend.offer.dto.OfferResponse;
 import pl.capyjet.backend.university.University;
@@ -57,6 +59,16 @@ public class OfferService {
             throw new NotFoundException("Offer", id);
         }
         offerRepository.deleteById(id);
+    }
+
+    @Transactional
+    public AcceptedOfferResponse accept(Long id){
+        Offer offer = findOffer(id);
+        if (!offer.isOpen()) {
+            throw new OfferNotAvailableException(id);
+        }
+        offer.accept();
+        return AcceptedOfferResponse.from(offer);
     }
 
     private Offer findOffer(Long id) {
