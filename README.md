@@ -6,25 +6,46 @@ A Spring Boot REST API for managing student project offers published by universi
 
 - Java 17
 - Spring Boot 4.1.1 (`spring-boot-starter-webmvc`, `spring-boot-starter-data-jpa`, `spring-boot-starter-validation`)
-- PostgreSQL (runtime datasource)
-- H2 (in-memory, currently used for local runs — see `application.properties`)
+- PostgreSQL (default runtime datasource)
+- H2 (in-memory, test-only — see `src/test/resources/application.properties`)
 - Lombok
 - springdoc-openapi (Swagger UI)
 - JUnit 5 + Mockito + AssertJ (tests)
+- Docker / Docker Compose
 
 ## Getting started
+
+### Option A — Docker Compose (recommended)
+
+```bash
+docker compose up --build
+```
+
+This starts a PostgreSQL container plus the app, wired together automatically. No local Postgres or JDK install required.
+
+### Option B — run locally against your own PostgreSQL
+
+The app expects a PostgreSQL database. By default (`application.properties`) it connects to:
+
+```
+jdbc:postgresql://localhost:5432/capyjet
+user: capyjet / password: capyjet
+```
+
+Start a matching Postgres instance yourself (e.g. `docker run -e POSTGRES_DB=capyjet -e POSTGRES_USER=capyjet -e POSTGRES_PASSWORD=capyjet -p 5432:5432 postgres:16-alpine`), then:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-The app starts on the default port `8080`. With the current configuration it uses an in-memory H2 database (recreated on every restart, `ddl-auto=create-drop`), so no external database setup is required to run it locally.
+Schema is managed with `spring.jpa.hibernate.ddl-auto=update` — tables are created/updated automatically on startup (no migration tool is used yet).
 
-- H2 console: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:capyjest`, user `sa`, empty password)
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - OpenAPI spec: `http://localhost:8080/v3/api-docs`
 
-To run the tests:
+### Tests
+
+Tests run against an in-memory H2 database (`src/test/resources/application.properties`), independent of any running Postgres instance:
 
 ```bash
 ./mvnw test
